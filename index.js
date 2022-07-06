@@ -15,7 +15,7 @@ app.use(express.json());
 // app.use(cors());
 // app.use(bodyParser.urlencoded({ extended: false }));
 
-app.post("/", (req, res) => {
+app.post("/testing_route", (req, res) => {
   const { ID, Amount, Currency, CustomerEmail, SplitInfo } = req.body;
 
   // res.json("")
@@ -40,17 +40,26 @@ app.post("/", (req, res) => {
     }
   });
 
+  let newFlatdata = [];
+
   while (flat.length > 0) {
     flat.map((item) => {
-      const { SplitValue } = item;
+      const { SplitValue, SplitEntityId } = item;
       amount -= SplitValue;
+
+      let flatdata = {
+        SplitEntityId: SplitEntityId,
+        Amount: SplitValue,
+      };
+
+      newFlatdata.push(flatdata);
     });
     break;
   }
 
-  console.log(`${amount} in flat`);
+  //   console.log(`${amount} in flat`);
 
-  let testPe = [];
+  let newPercentage = [];
 
   while (Percentage.length > 0) {
     Percentage.map((item) => {
@@ -60,16 +69,16 @@ app.post("/", (req, res) => {
         SplitEntityId: SplitEntityId,
         Amount: per_amount,
       };
-      testPe.push(per_new);
+      newPercentage.push(per_new);
       amount -= per_amount;
     });
     break;
   }
 
-  console.log(`${amount} in percentage`);
+  //   console.log(`${amount} in percentage`);
 
   //   console.log(testPe);
-  let testratios = [];
+  let newratiodata = [];
   let total_ratio = 0;
 
   ratio.map((item) => {
@@ -77,12 +86,12 @@ app.post("/", (req, res) => {
     total_ratio += SplitValue;
   });
 
-  console.log(total_ratio);
+  //   console.log(total_ratio);
 
   while (ratio.length > 0) {
     ratio.map((item) => {
       const { SplitValue, SplitEntityId } = item;
-      console.log(total_ratio + "ww");
+      //   console.log(total_ratio + "ww");
 
       rai_amount = (SplitValue / total_ratio) * amount;
 
@@ -91,35 +100,43 @@ app.post("/", (req, res) => {
         Amount: rai_amount,
       };
       amount -= rai_amount;
-      testratios.push(ras);
+      newratiodata.push(ras);
     });
 
     break;
   }
 
-  console.log(`${amount} in Ratio`);
+  //   console.log(`${amount} in Ratio`);
 
-  res.status(200).json("whoking");
+  //   const flat = [];
+  //   const ratio = [];
+  //   const Percentage = [];
 
-  //   const Userdata = {
-  //     id: ID,
-  //     Balance: Amount,
-  //     SplitBreakdown: [
-  //       {
-  //         SplitEntityId: "LNPYACC0019",
-  //         Amount: 5000,
-  //       },
-  //       {
-  //         SplitEntityId: "LNPYACC0011",
-  //         Amount: 2000,
-  //       },
-  //       {
-  //         SplitEntityId: "LNPYACC0015",
-  //         Amount: 2000,
-  //       },
-  //     ],
-  //   };
-  //   res.status(200).json("Userdata");
+  let Data_flat_percentage_ratio = [];
+
+  for (let index = 0; index < newFlatdata.length; index++) {
+    const element = newFlatdata[index];
+    Data_flat_percentage_ratio.push(element);
+  }
+
+  for (let index = 0; index < newPercentage.length; index++) {
+    const element = newPercentage[index];
+    Data_flat_percentage_ratio.push(element);
+  }
+
+  for (let index = 0; index < newratiodata.length; index++) {
+    const element = newratiodata[index];
+    Data_flat_percentage_ratio.push(element);
+  }
+
+  console.log(Data_flat_percentage_ratio);
+
+  const Userdata = {
+    id: ID,
+    Balance: Amount,
+    SplitBreakdown: Data_flat_percentage_ratio,
+  };
+  res.status(200).json(Userdata);
 });
 
 app.post("/split-payments/compute", (req, res) => {
@@ -127,23 +144,121 @@ app.post("/split-payments/compute", (req, res) => {
 
   // res.json("")
   //   res.send("<h1> Samheart</h1>");
+
+  let amount = Amount;
+
+  const flat = [];
+  const ratio = [];
+  const Percentage = [];
+  let flat_amount = 0;
+  SplitInfo.map((item) => {
+    const { SplitType } = item;
+    if (SplitType === "FLAT") {
+      flat.push(item);
+    } else if (SplitType === "RATIO") {
+      ratio.push(item);
+    } else if (SplitType === "PERCENTAGE") {
+      Percentage.push(item);
+    } else {
+      console.log("error");
+    }
+  });
+
+  let newFlatdata = [];
+
+  while (flat.length > 0) {
+    flat.map((item) => {
+      const { SplitValue, SplitEntityId } = item;
+      amount -= SplitValue;
+
+      let flatdata = {
+        SplitEntityId: SplitEntityId,
+        Amount: SplitValue,
+      };
+
+      newFlatdata.push(flatdata);
+    });
+    break;
+  }
+
+  //   console.log(`${amount} in flat`);
+
+  let newPercentage = [];
+
+  while (Percentage.length > 0) {
+    Percentage.map((item) => {
+      const { SplitValue, SplitEntityId } = item;
+      per_amount = (SplitValue / 100) * amount;
+      const per_new = {
+        SplitEntityId: SplitEntityId,
+        Amount: per_amount,
+      };
+      newPercentage.push(per_new);
+      amount -= per_amount;
+    });
+    break;
+  }
+
+  //   console.log(`${amount} in percentage`);
+
+  //   console.log(testPe);
+  let newratiodata = [];
+  let total_ratio = 0;
+
+  ratio.map((item) => {
+    const { SplitValue, SplitEntityId } = item;
+    total_ratio += SplitValue;
+  });
+
+  //   console.log(total_ratio);
+
+  while (ratio.length > 0) {
+    ratio.map((item) => {
+      const { SplitValue, SplitEntityId } = item;
+      //   console.log(total_ratio + "ww");
+
+      rai_amount = (SplitValue / total_ratio) * amount;
+
+      const ras = {
+        SplitEntityId: SplitEntityId,
+        Amount: rai_amount,
+      };
+      amount -= rai_amount;
+      newratiodata.push(ras);
+    });
+
+    break;
+  }
+
+  //   console.log(`${amount} in Ratio`);
+
+  //   const flat = [];
+  //   const ratio = [];
+  //   const Percentage = [];
+
+  let Data_flat_percentage_ratio = [];
+
+  for (let index = 0; index < newFlatdata.length; index++) {
+    const element = newFlatdata[index];
+    Data_flat_percentage_ratio.push(element);
+  }
+
+  for (let index = 0; index < newPercentage.length; index++) {
+    const element = newPercentage[index];
+    Data_flat_percentage_ratio.push(element);
+  }
+
+  for (let index = 0; index < newratiodata.length; index++) {
+    const element = newratiodata[index];
+    Data_flat_percentage_ratio.push(element);
+  }
+
+  console.log(Data_flat_percentage_ratio);
+
   const Userdata = {
     id: ID,
     Balance: Amount,
-    SplitBreakdown: [
-      {
-        SplitEntityId: "LNPYACC0019",
-        Amount: 5000,
-      },
-      {
-        SplitEntityId: "LNPYACC0011",
-        Amount: 2000,
-      },
-      {
-        SplitEntityId: "LNPYACC0015",
-        Amount: 2000,
-      },
-    ],
+    SplitBreakdown: Data_flat_percentage_ratio,
   };
   res.status(200).json(Userdata);
 });
