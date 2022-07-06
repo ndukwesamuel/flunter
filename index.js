@@ -257,7 +257,7 @@ app.post("/split-payments/compute", (req, res) => {
 
   const Userdata = {
     id: ID,
-    Balance: Amount,
+    Balance: amount,
     SplitBreakdown: Data_flat_percentage_ratio,
   };
   res.status(200).json(Userdata);
