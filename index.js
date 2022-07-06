@@ -48,6 +48,8 @@ app.post("/", (req, res) => {
     break;
   }
 
+  console.log(`${amount} in flat`);
+
   let testPe = [];
 
   while (Percentage.length > 0) {
@@ -64,20 +66,30 @@ app.post("/", (req, res) => {
     break;
   }
 
-  console.log(testPe);
+  //   console.log(testPe);
+  let testratios = [];
   let total_ratio = 0;
 
   while (ratio.length > 0) {
     ratio.map((item) => {
       const { SplitValue, SplitEntityId } = item;
       total_ratio += SplitValue;
-      console.log(`${amount} new`);
-      amount = (SplitValue / total_ratio) * amount;
+    });
+
+    console.log(total_ratio);
+
+    ratio.map((item) => {
+      const { SplitValue, SplitEntityId } = item;
+      console.log(`${amount}old`);
+      total_ratio += SplitValue;
+      rai_amount = (SplitValue / total_ratio) * amount;
 
       const ras = {
         SplitEntityId: SplitEntityId,
-        Amount,
+        Amount: rai_amount,
       };
+      testratios.push(ras);
+      amount -= rai_amount;
 
       //   const { SplitValue } = item;
 
@@ -85,9 +97,10 @@ app.post("/", (req, res) => {
       //   amount -= SplitValue;
     });
 
-    console.log(total_ratio);
     break;
   }
+
+  console.log(testratios);
 
   console.log(amount);
   const data = [ratio, flat, Percentage];
