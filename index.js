@@ -15,9 +15,10 @@ app.use(express.json());
 // app.use(cors());
 // app.use(bodyParser.urlencoded({ extended: false }));
 
-app.get("/test", (req, res) => {
+app.get("/", (req, res) => {
   // res.json("")
-  res.json("working");
+  res.send("<h1> Samheart</h1>");
+  //   res.json()
 });
 
 app.listen(port, () => {
