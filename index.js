@@ -66,46 +66,40 @@ app.post("/", (req, res) => {
     break;
   }
 
+  console.log(`${amount} in percentage`);
+
   //   console.log(testPe);
   let testratios = [];
   let total_ratio = 0;
 
+  ratio.map((item) => {
+    const { SplitValue, SplitEntityId } = item;
+    total_ratio += SplitValue;
+  });
+
+  console.log(total_ratio);
+
   while (ratio.length > 0) {
     ratio.map((item) => {
       const { SplitValue, SplitEntityId } = item;
-      total_ratio += SplitValue;
-    });
+      console.log(total_ratio + "ww");
 
-    console.log(total_ratio);
-
-    ratio.map((item) => {
-      const { SplitValue, SplitEntityId } = item;
-      console.log(`${amount}old`);
-      total_ratio += SplitValue;
       rai_amount = (SplitValue / total_ratio) * amount;
 
       const ras = {
         SplitEntityId: SplitEntityId,
         Amount: rai_amount,
       };
-      testratios.push(ras);
       amount -= rai_amount;
-
-      //   const { SplitValue } = item;
-
-      //   (SplitValue * amount )
-      //   amount -= SplitValue;
+      testratios.push(ras);
     });
 
     break;
   }
 
-  console.log(testratios);
+  console.log(`${amount} in Ratio`);
 
-  console.log(amount);
-  const data = [ratio, flat, Percentage];
-
-  res.status(200).json(data);
+  res.status(200).json("whoking");
 
   //   const Userdata = {
   //     id: ID,
